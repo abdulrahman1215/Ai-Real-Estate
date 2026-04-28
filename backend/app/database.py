@@ -7,7 +7,18 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL)
+if not DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL is not set. Please check your backend/.env file.\n"
+        "Example: postgresql://postgres:postgres@localhost:5432/realestate"
+    )
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    connect_args={"connect_timeout": 10},
+)
 
 SessionLocal = sessionmaker(
     autocommit=False,
